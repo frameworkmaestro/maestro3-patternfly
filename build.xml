@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="SIGA/Eventos" default="build" basedir=".">
+
+    <!-- Application path's definition -->
+    <property name="app.builddir" value="${project.basedir}/build"/>
+    <property name="app.phpunit.reports" value="${app.builddir}/reports/phpunit/"/>
+    <property name="app.migrations" value="${project.basedir}/migrations"/>
+    <property name="vendor.bin" value="${project.basedir}/vendor/bin"/>
+    <property name="bin" value="${project.basedir}/bin"/>
+    <property name="siga.path" value="${project.basedir}/../../"/>
+    <property name="maestro.path" value="${siga.path}/../../"/>
+    <property name="app.doc.md" value="${project.basedir}/doc/api/md"/>
+
+    <!-- Targets -->
+    <target name="clean" description="Limpa os diretórios de artefatos do build anterior">
+        <delete dir="${app.phpunit.reports}"/>
+    </target>
+
+    <target name="prepare" depends="clean" description="Cria os diretórios de artefatos do build">
+        <mkdir dir="${app.phpunit.reports}"/>
+    </target>
+
+    <target name="svn:update:maestro:siga" description="Atualiza o Maestro e o SIGA">
+        <echo>Atualizando o Maestro (svn update ${maestro.path})</echo>
+        <exec command="svn update ${maestro.path}"/>
+        <echo>Atualizando o SIGA (svn update ${siga.path})</echo>
+        <exec command="svn update ${siga.path}"/>
+    </target>
+
+    <target name="composer:install:siga" depends="svn:update:maestro:siga" description="Instala as dependências do SIGA via composer">
+        <composer command="install" composer="/usr/local/bin/composer">
+            <arg value="--working-dir"/>
+            <arg value="${siga.path}"/>
+        </composer>
+    </target>
+
+    <target name="composer:install" description="Instala as dependências do módulo Eventos via composer">
+        <composer command="install" composer="/usr/local/bin/composer"/>
+    </target>
+
+    <target name="api:update:html" depends="composer:install" description="Atualiza a API em HTML">
+        <exec command="${vendor.bin}/sami.php update doc/api/sami_config.php" checkreturn="true"/>
+    </target>
+
+    <target name="api:update:md" depends="composer:install" description="Atualiza a API em Markdown">
+        <exec command="php ${bin}/phpDocumentor.phar -d src/ -t ${app.doc.md}/xml/ --template='xml'"
+              checkreturn="true"/>
+        <exec command="${vendor.bin}/phpdocmd ${app.doc.md}/xml/structure.xml ${app.doc.md}"
+              checkreturn="true"/>
+    </target>
+
+    <target name="api:update" depends="api:update:html,api:update:md"/>
+
+    <target name="phpunit" description="Testes Unitários">
+        <exec dir="${app.builddir}"
+              command="phpunit --configuration phpunit.xml"
+              checkreturn="true"/>
+    </target>
+
+    <target name="db:migrate" depends="composer:install" description="Migra o banco de dados">
+        <exec dir="${app.migrations}"
+              command="${vendor.bin}/doctrine-migrations migrations:migrate --no-interaction"
+              checkreturn="true"/>
+    </target>
+
+    <target name="build" depends="clean,prepare,svn:update:maestro:siga,composer:install:siga,composer:install,phpunit"/>
+</project>

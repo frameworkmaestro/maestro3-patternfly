@@ -1,0 +1,4 @@
+name: Eventos Migrations
+migrations_namespace: eventos\migrations
+table_name: eventos_migration_versions
+migrations_directory: ./versions
