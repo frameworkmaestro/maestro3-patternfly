@@ -1,0 +1,10 @@
+{{layout 'layout.latte.html'}}
+
+{{block body}}
+<body>
+{{include 'menu.latte.html'}}
+<div id="content">
+    {{$page->generate('content')|noescape}}
+</div>
+</body>
+{{/block}}

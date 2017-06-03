@@ -1,0 +1,32 @@
+<!-- status cards -->
+<div class="row row-cards-pf">
+    {{foreach $data->statusCards as $card}}
+    <div class="col-xs-12 col-md-2">
+        <div class="card-pf card-pf-accented card-pf-aggregate-status">
+            <h2 class="card-pf-title">
+                <a href="#"><span class="fa fa-shield"></span><span class="card-pf-aggregate-status-count">{{$card->count}}</span> {{$card->title}}</a>
+            </h2>
+            <div class="card-pf-body">
+                <p class="card-pf-aggregate-status-notifications">
+                    <span class="card-pf-aggregate-status-notification">
+                        {{if $card->notification->add}}
+                            <a href="#" class="add" data-toggle="tooltip" data-placement="top" title="{{$notification->add->title}}">
+                            <span class="pficon pficon-add-circle-o"></span></a></span>
+                        {{/if}}
+                        {{if $card->notification->error}}
+                            <span class="card-pf-aggregate-status-notification"><a href="#"><span class="pficon pficon-error-circle-o"></span>{{$card->notification->error->countError}}</a></span>
+                            <span class="card-pf-aggregate-status-notification"><a href="#"><span class="pficon pficon-warning-triangle-o"></span>{{$card->notification->error->countWarning}}</a></span>
+                        {{/if}}
+                        {{if $card->notification->ok}}
+                            <span class="card-pf-aggregate-status-notification"><span class="pficon pficon-ok"></span></span>
+                        {{/if}}
+                </p>
+            </div>
+        </div>
+    </div>
+    {{/foreach}}
+</div>
+<div class="row row-cards-pf">
+{{include 'utilization.html'}}
+{{include 'topclusters.html'}}
+</div>

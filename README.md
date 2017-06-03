@@ -1,2 +1,8 @@
 # maestro-patternfly
-PatternFly Theme for Maestro
+PatternFly Demo for Maestro
+
+## build
+
+npm i
+
+npm run build:prod
